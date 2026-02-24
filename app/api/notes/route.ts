@@ -18,3 +18,9 @@ export async function POST(request: Request) {
   });
   return Response.json(note, { status: 201 });
 }
+
+New features (feature/*)
+
+Emergency fixes (hotfix/*)
+
+Action: Create a new branch named feature/docker-setup and push it to GitHub. Stay on this branch for the rest of the sprint.
