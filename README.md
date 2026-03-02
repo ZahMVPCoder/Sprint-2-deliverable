@@ -1,42 +1,48 @@
+
 # BrightPath DevOps Lab: Orchestration & Stability
 
 ## Architecture
-This project uses a two-container setup:
+This project uses a two-container Docker Compose setup:
 - **app**: Runs the Next.js application.
 - **db**: Runs the Postgres database.
 
-Containers communicate using Docker service names (e.g., `db` in the DATABASE_URL), ensuring reliable networking and isolation.
+Both containers communicate over a private Docker network using service names (e.g., `db` in the DATABASE_URL). This ensures secure, reliable networking and isolation between services.
 
 ## Quick Start
-To start everything:
+Start the entire stack with a single command:
 
 ```bash
 docker compose up -d --build
 ```
 
-This command builds and launches both containers. No manual steps required.
+This builds and launches both containers in detached mode. No manual linking or individual builds required.
 
 ## Stability Features
-- **Healthchecks**: Both app and db containers have healthchecks. The app uses `wget` to check if http://localhost:3000 is up; the db uses `pg_isready`.
-- **Restart Policies**: Both containers are set to `restart: always`, so they automatically recover from crashes.
+- **Healthchecks**: The app container uses `wget` to check if http://localhost:3000 is responding. The db container uses `pg_isready` to verify Postgres is ready.
+- **Restart Policies**: Both app and db containers use `restart: always` to automatically recover from crashes or failures.
 
 ## Environment Management
-- Secrets and environment variables are managed with `.env.production` (not tracked by git).
-- The app service loads secrets via `env_file` in `docker-compose.yml`.
+- Secrets and environment variables (like `DATABASE_URL`) are stored in `.env.production`, which is loaded via `env_file` in `docker-compose.yml`.
+- `.env.production` is excluded from git to keep secrets safe.
 
 ## Business Value
-BrightPath needs reliable, always-on educational apps. Orchestration ensures:
-- Automatic recovery from failures
-- Consistent startup for all teammates
-- Secure handling of secrets
-- Deterministic environments for easy onboarding
+BrightPath’s educational platform must be reliable and always available. Orchestration with Docker Compose provides:
+- Automatic recovery from service failures
+- Consistent, one-command startup for all team members
+- Secure, centralized secret management
+- Predictable environments for onboarding and scaling
 
+feature/docker-setup
 ## Why Orchestration Matters
-Orchestration lets educational apps run reliably, scale easily, and recover from failures without manual intervention. It ensures every student and teacher gets a consistent, stable experience.
+Orchestration is critical for educational apps like BrightPath. It ensures:
+- Reliable service availability for students and teachers
+- Easy scaling and maintenance
+- Fast recovery from crashes without manual intervention
+- Consistent environments for learning and collaboration
 
-## Getting Started
+## Getting Started (Development)
 
-First, run the development server:
+To run the development server locally:
 
 ```bash
 npm run dev
@@ -44,7 +50,6 @@ npm run dev
 yarn dev
 # or
 pnpm dev
-# or
 bun dev
 ```
 
