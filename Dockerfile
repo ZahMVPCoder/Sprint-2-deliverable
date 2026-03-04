@@ -8,7 +8,9 @@ COPY package*.json ./
 RUN npm install
 ## Copy all remaining files from the project into the container
 COPY . .
+## Generate the Prisma client from the schema (no DB connection needed)
+RUN npx prisma generate
 ## Expose port 3000 for the application
 EXPOSE 3000
-## Start the app in development mode using npm
-CMD ["npm", "run", "dev"]
+## Run database migrations (waits for DB to be ready via depends_on), then start the app
+CMD ["sh", "-c", "npx prisma migrate deploy && npm run dev"]

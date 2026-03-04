@@ -7,8 +7,9 @@ services: # Define the services for the application
     volumes:
       - .:/app # Mount the project directory to /app in the container
       - /app/node_modules # Ensure node_modules is not overwritten by the volume
-    env_file:
-      - .env.production # Load environment variables from this file
+    environment:
+      # Points to the 'db' service by its service name (Docker internal DNS)
+      DATABASE_URL: postgresql://postgres:password@db:5432/mydb
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "wget --spider --quiet http://localhost:3000 || exit 1"] # Check if app is healthy by requesting its endpoint

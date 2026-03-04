@@ -23,9 +23,17 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      # Generate Prisma client from schema (does not need a real DB connection)
+      - name: Generate Prisma client
+        run: npx prisma generate
+        env:
+          DATABASE_URL: postgresql://postgres:password@localhost:5432/mydb
+
       # Build the project
       - name: Build
         run: npm run build
+        env:
+          DATABASE_URL: postgresql://postgres:password@localhost:5432/mydb
 
       # Lint the project
       - name: Lint
