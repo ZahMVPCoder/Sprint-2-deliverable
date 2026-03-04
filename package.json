@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint --dir app"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.4.2",
