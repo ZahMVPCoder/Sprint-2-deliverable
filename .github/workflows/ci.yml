@@ -1,26 +1,24 @@
 name: CI
 
-on:
-  push:
-    branches: [ main, feature/docker-setup ]
-  pull_request:
-    branches: [ main, feature/docker-setup ]
+name: CI
 
-jobs:
+      - name: Install dependencies
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+        run: npm install
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Install dependencies
-        run: npm install
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    - run: npm install
+    - run: npm run build
 
       - name: Run tests
         run: npm test
