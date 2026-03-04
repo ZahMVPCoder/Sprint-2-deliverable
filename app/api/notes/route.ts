@@ -1,9 +1,9 @@
 import { PrismaClient } from '@prisma/client';
-// In Prisma 7, the database URL must be passed directly to PrismaClient at runtime
-// (prisma.config.ts only affects the CLI, not the running app)
-const prisma = new PrismaClient({
-  datasourceUrl: process.env.DATABASE_URL,
-});
+import { PrismaPg } from '@prisma/adapter-pg';
+// In Prisma 7, pass a driver adapter directly to PrismaClient
+// PrismaPg handles the connection using DATABASE_URL env variable
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const prisma = new PrismaClient({ adapter });
 
 export async function GET() {
   const notes = await prisma.note.findMany({

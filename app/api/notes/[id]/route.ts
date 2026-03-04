@@ -1,10 +1,10 @@
 import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { NextRequest } from 'next/server';
-// In Prisma 7, the database URL must be passed directly to PrismaClient at runtime
-// (prisma.config.ts only affects the CLI, not the running app)
-const prisma = new PrismaClient({
-  datasourceUrl: process.env.DATABASE_URL,
-});
+// In Prisma 7, pass a driver adapter directly to PrismaClient
+// PrismaPg handles the connection using DATABASE_URL env variable
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const prisma = new PrismaClient({ adapter });
 
 // This function handles GET requests to /api/notes/[id]
 // In Next.js 15+, params is a Promise - you must await it to get the actual values
