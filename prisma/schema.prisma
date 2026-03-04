@@ -8,10 +8,9 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// In Prisma 7+, the database URL is configured in prisma.config.ts, not here
 datasource db {
   provider = "postgresql"
-  // DATABASE_URL is set via environment variable (see .env or docker-compose.yml)
-  url      = env("DATABASE_URL")
 }
 
 model Note {
