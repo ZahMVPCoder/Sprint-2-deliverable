@@ -1,39 +1,39 @@
 
-services:
+services: # Define the services for the application
   app:
-    build: .
+    build: . # Build the app image from the Dockerfile in the current directory
     ports:
-      - "3000:3000"
+      - "3000:3000" # Map port 3000 on host to port 3000 in the container
     volumes:
-      - .:/app
-      - /app/node_modules
+      - .:/app # Mount the project directory to /app in the container
+      - /app/node_modules # Ensure node_modules is not overwritten by the volume
     env_file:
-      - .env.production
+      - .env.production # Load environment variables from this file
     restart: always
     healthcheck:
-      test: ["CMD-SHELL", "wget --spider --quiet http://localhost:3000 || exit 1"]
+      test: ["CMD-SHELL", "wget --spider --quiet http://localhost:3000 || exit 1"] # Check if app is healthy by requesting its endpoint
       interval: 10s
       timeout: 5s
       retries: 3
     depends_on:
       db:
-        condition: service_healthy
+        condition: service_healthy # Wait for db to be healthy before starting app
 
   db:
-    image: postgres:15
+    image: postgres:15 # Use official Postgres 15 image
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: mydb
+      POSTGRES_USER: postgres # Database username
+      POSTGRES_PASSWORD: password # Database password
+      POSTGRES_DB: mydb # Database name
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data # Persist database data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"] # Check if Postgres is ready
       interval: 10s
       timeout: 5s
       retries: 5
     restart: always
 
 volumes:
-  pgdata:
+  pgdata: # Named volume for Postgres data
   
