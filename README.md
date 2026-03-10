@@ -1,6 +1,23 @@
 
 # BrightPath DevOps Lab: Orchestration & Stability
 
+## Feature → Problem It Solves
+
+| Feature | Problem It Solves |
+|---|---|
+| **Docker Compose multi-container orchestration** (`app` + `db` services) | Manually starting, linking, and coordinating multiple services is error-prone and inconsistent across team members. |
+| **Single command startup** (`docker compose up -d --build`) | Developers waste time with lengthy setup steps; onboarding new team members is slow and fragile. |
+| **Named Docker network (internal DNS)** — `db` resolved by service name | Hardcoding IP addresses for inter-service communication breaks when containers restart or move. |
+| **Healthchecks** — `wget` for app, `pg_isready` for db | Services start in the wrong order or connect before the dependency is ready, causing startup crashes. |
+| **`depends_on` with `condition: service_healthy`** | The app container tries to connect to Postgres before it's ready, causing migration or connection failures. |
+| **`restart: always` policy** on both containers | A crashed service stays down until someone manually restarts it, causing prolonged downtime. |
+| **Named volume `pgdata`** for Postgres | Database data is lost when the `db` container is removed or recreated. |
+| **Prisma ORM + migrations** (`prisma migrate deploy` in CMD) | Schema changes must be applied manually and inconsistently across environments. |
+| **`.env.production` via `env_file`** (excluded from git) | Secrets like `DATABASE_URL` get hardcoded into source code or committed to version control. |
+| **`.dockerignore`** | Unnecessary files (e.g., `node_modules`, `.git`) bloat the Docker build context, slowing builds and risking secret leakage. |
+| **Alpine-based Node image** (`node:25-alpine3.22`) | Full-size base images produce unnecessarily large container images, increasing pull/deploy times. |
+| **`npx prisma generate` in Dockerfile** | The Prisma client is missing at runtime inside the container because it's generated locally but not inside the image. |
+
 ## Architecture
 This project uses a two-container Docker Compose setup:
 - **app**: Runs the Next.js application.
