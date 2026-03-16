@@ -8,7 +8,7 @@ import { useAuth } from "../../context/AuthContext";
 interface LessonDetail {
   id: string;
   title: string;
-  subject: "Math" | "Science";
+  subject: "Math" | "Science" | "English" | "History";
   content: string;
   videoUrl?: string;
   duration?: number;
@@ -119,11 +119,11 @@ export default function LessonDetailPage() {
               fontSize: 12,
               fontFamily: "var(--font-display)",
               fontWeight: 600,
-              background: lesson.subject === "Math" ? "#DBEAFE" : "#D1FAE5",
-              color: lesson.subject === "Math" ? "#2563EB" : "#059669",
+              background: ({ Math: "#DBEAFE", Science: "#D1FAE5", English: "#FEF3C7", History: "#EDE9FE" } as Record<string,string>)[lesson.subject] ?? "#F1F5F9",
+              color: ({ Math: "#2563EB", Science: "#059669", English: "#D97706", History: "#7C3AED" } as Record<string,string>)[lesson.subject] ?? "var(--color-text-muted)",
             }}
           >
-            {lesson.subject === "Math" ? "📐" : "🔬"} {lesson.subject}
+            {({ Math: "📐", Science: "🔬", English: "📚", History: "🏛️" } as Record<string,string>)[lesson.subject] ?? "📖"} {lesson.subject}
           </span>
           {lesson.duration != null && (
             <span style={{ padding: "4px 12px", borderRadius: 999, fontSize: 12, fontFamily: "var(--font-display)", fontWeight: 600, background: "#F1F5F9", color: "var(--color-text-muted)" }}>

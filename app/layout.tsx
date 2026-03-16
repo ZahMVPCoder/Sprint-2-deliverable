@@ -4,7 +4,7 @@ import { AuthProvider } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
 
 export const metadata: Metadata = {
-  title: "BrightPath — Learn Math & Science",
+  title: "BrightPath — Learn Math, Science, English & History",
   description: "Tutoring platform for middle and high school students",
 };
 

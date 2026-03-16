@@ -9,7 +9,7 @@ interface ProgressEntry {
   id: string;
   lessonId: string;
   lessonTitle: string;
-  subject: "Math" | "Science";
+  subject: string;
   score: number;
   completedAt: string;
 }
@@ -188,7 +188,9 @@ export default function ProgressPage() {
           {/* Subject breakdown */}
           {data.entries.length > 0 && (
             <div style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 12 }}>
-              {(["Math", "Science"] as const).map((subj) => {
+              {(["Math", "Science", "English", "History"] as const).map((subj) => {
+                const icons: Record<string, string> = { Math: "📐", Science: "🔬", English: "📚", History: "🏛️" };
+                const colors: Record<string, string> = { Math: "var(--color-secondary)", Science: "var(--color-primary)", English: "#D97706", History: "#7C3AED" };
                 const subjEntries = data.entries.filter((e) => e.subject === subj);
                 const subjAvg = subjEntries.length
                   ? Math.round(subjEntries.reduce((s, e) => s + e.score, 0) / subjEntries.length)
@@ -197,17 +199,13 @@ export default function ProgressPage() {
                   <div key={subj}>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
                       <span style={{ fontSize: 14, fontFamily: "var(--font-display)", fontWeight: 600 }}>
-                        {subj === "Math" ? "📐" : "🔬"} {subj}
+                        {icons[subj]} {subj}
                       </span>
                       <span style={{ fontSize: 14, color: "var(--color-text-muted)", fontFamily: "var(--font-body)" }}>
                         {subjEntries.length} quiz{subjEntries.length !== 1 ? "zes" : ""} · avg {subjAvg}%
                       </span>
                     </div>
-                    <ProgressBar
-                      value={subjAvg}
-                      max={100}
-                      color={subj === "Math" ? "var(--color-secondary)" : "var(--color-primary)"}
-                    />
+                    <ProgressBar value={subjAvg} max={100} color={colors[subj]} />
                   </div>
                 );
               })}
@@ -316,8 +314,8 @@ export default function ProgressPage() {
                     fontSize: 12,
                     fontFamily: "var(--font-display)",
                     fontWeight: 600,
-                    background: entry.subject === "Math" ? "#DBEAFE" : "#D1FAE5",
-                    color: entry.subject === "Math" ? "#2563EB" : "#059669",
+                    background: ({ Math: "#DBEAFE", Science: "#D1FAE5", English: "#FEF3C7", History: "#EDE9FE" } as Record<string,string>)[entry.subject] ?? "#F1F5F9",
+                    color: ({ Math: "#2563EB", Science: "#059669", English: "#D97706", History: "#7C3AED" } as Record<string,string>)[entry.subject] ?? "var(--color-text-muted)",
                   }}
                 >
                   {entry.subject}

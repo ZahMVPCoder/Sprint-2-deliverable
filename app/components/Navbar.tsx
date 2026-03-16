@@ -12,6 +12,7 @@ export default function Navbar() {
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/lessons", label: "Lessons" },
+    { href: "/ai-quiz", label: "AI Quiz ✨" },
     { href: "/progress", label: "Progress" },
   ];
 
