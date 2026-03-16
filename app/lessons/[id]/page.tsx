@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "../../context/AuthContext";
 
@@ -19,7 +19,6 @@ interface LessonDetail {
 export default function LessonDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { student } = useAuth();
-  const router = useRouter();
 
   const [lesson, setLesson] = useState<LessonDetail | null>(null);
   const [loading, setLoading] = useState(true);
