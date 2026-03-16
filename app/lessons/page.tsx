@@ -42,7 +42,7 @@ export default function LessonsPage() {
   // Add-lesson modal
   const [showModal, setShowModal]       = useState(false);
   const [newTitle, setNewTitle]         = useState("");
-  const [newSubject, setNewSubject]     = useState<"Math" | "Science" | "English" | "History" | "">(");
+  const [newSubject, setNewSubject]     = useState<"Math" | "Science" | "English" | "History" | "">("");
   const [newContent, setNewContent]     = useState("");
   const [submitting, setSubmitting]     = useState(false);
   const [submitError, setSubmitError]   = useState("");
