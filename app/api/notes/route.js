@@ -1,9 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
-// In Prisma 7, pass a driver adapter directly to PrismaClient
-// PrismaPg handles the connection using DATABASE_URL env variable
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
-const prisma = new PrismaClient({ adapter });
+import { prisma } from '../../../lib/prisma.js';
 
 export async function GET() {
   const notes = await prisma.note.findMany({
