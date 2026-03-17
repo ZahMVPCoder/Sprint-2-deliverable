@@ -69,6 +69,10 @@ jobs:
             fi
             cd ~/app
             git pull origin main
-            # 3. Start/restart containers
-            docker-compose down || true
-            docker-compose up -d --build
+            # 3. Ensure .env exists and has OLLAMA_MODEL
+            if ! grep -q OLLAMA_MODEL .env; then
+              echo 'OLLAMA_MODEL=llama3.2' >> .env
+            fi
+            # 4. Start/restart containers with sudo
+            sudo docker-compose down || true
+            sudo docker-compose up -d --build
