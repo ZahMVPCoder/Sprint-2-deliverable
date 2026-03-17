@@ -8,8 +8,8 @@ services: # Define the services for the application
       - .:/app # Mount the project directory to /app in the container
       - /app/node_modules # Ensure node_modules is not overwritten by the volume
     environment:
-      # Points to the 'db' service by its service name (Docker internal DNS)
-      DATABASE_URL: postgresql://postgres:password@db:5432/mydb
+      # Use Neon Postgres for the app
+      DATABASE_URL: ${DATABASE_URL}
       # Ollama model for the AI Quiz Generator feature
       OLLAMA_MODEL: ${OLLAMA_MODEL}
     restart: always
@@ -18,26 +18,5 @@ services: # Define the services for the application
       interval: 10s
       timeout: 5s
       retries: 3
-    depends_on:
-      db:
-        condition: service_healthy # Wait for db to be healthy before starting app
 
-  db:
-    image: postgres:15 # Use official Postgres 15 image
-    environment:
-      POSTGRES_USER: postgres # Database username
-      POSTGRES_PASSWORD: password # Database password
-      POSTGRES_DB: mydb # Database name
-    volumes:
-      - pgdata:/var/lib/postgresql/data # Persist database data
-    ports:
-      - "5432:5432" # Expose Postgres to host for local dev (npm run dev)
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"] # Check if Postgres is ready
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: always
 
-volumes:
-  pgdata: # Named volume for Postgres data
