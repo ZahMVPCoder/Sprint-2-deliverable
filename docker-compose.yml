@@ -1,22 +1,45 @@
+version: '3.8'
 
-services: # Define the services for the application
-  app:
-    build: . # Build the app image from the Dockerfile in the current directory
-    ports:
-      - "80:3000" # Map port 80 on host to port 3000 in the container
-    volumes:
-      - .:/app # Mount the project directory to /app in the container
-      - /app/node_modules # Ensure node_modules is not overwritten by the volume
+services:
+  # Database service (Postgres)
+  db:
+    image: postgres:15
     environment:
-      # Use Neon Postgres for the app
-      DATABASE_URL: ${DATABASE_URL}
-      # Ollama model for the AI Quiz Generator feature
-      OLLAMA_MODEL: ${OLLAMA_MODEL}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydb
+    ports:
+      - "5432:5432" # Expose Postgres for local dev tools
+    volumes:
+      - pgdata:/var/lib/postgresql/data # Persist database data
+
+  # App service (your Next.js app)
+  app:
+    build: . # Build from your Dockerfile
+    ports:
+      - "80:3000" # Map port 80 on your computer to 3000 in the container
+    volumes:
+      - .:/app # Mount your code for live reload (dev only)
+      - /app/node_modules # Prevent node_modules overwrite
+    environment:
+      # Use this for local development (connects to the db service above)
+      DATABASE_URL: postgres://postgres:password@db:5432/mydb
+      # For production, override this with your Neon DATABASE_URL in .env
+      OLLAMA_MODEL: llama3.2
+    depends_on:
+      - db
     restart: always
     healthcheck:
-      test: ["CMD-SHELL", "wget --spider --quiet http://localhost:3000 || exit 1"] # Check if app is healthy by requesting its endpoint
+      test: ["CMD-SHELL", "wget --spider --quiet http://localhost:3000 || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 3
+
+volumes:
+  pgdata: # Docker-managed volume for Postgres data
+
+# --- How to use ---
+# For local dev: docker compose up --build
+# For production: set DATABASE_URL in your .env to your Neon URL and remove the db service above
 
 
