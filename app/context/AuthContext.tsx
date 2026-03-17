@@ -29,6 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const stored = localStorage.getItem("brightpath_student");
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (stored) setStudentState(JSON.parse(stored));
     } catch {
       // ignore
