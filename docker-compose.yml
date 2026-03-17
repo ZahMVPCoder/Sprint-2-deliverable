@@ -10,8 +10,8 @@ services: # Define the services for the application
     environment:
       # Points to the 'db' service by its service name (Docker internal DNS)
       DATABASE_URL: postgresql://postgres:password@db:5432/mydb
-      # OpenAI API key for the AI Quiz Generator feature
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      # Ollama model for the AI Quiz Generator feature
+      OLLAMA_MODEL: ${OLLAMA_MODEL}
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "wget --spider --quiet http://localhost:3000 || exit 1"] # Check if app is healthy by requesting its endpoint

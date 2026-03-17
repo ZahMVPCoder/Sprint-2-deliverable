@@ -1,6 +1,8 @@
-import OpenAI from 'openai';
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// Use Ollama HTTP API instead of OpenAI
+const OLLAMA_URL = process.env.OLLAMA_URL || 'http://host.docker.internal:11434/api/chat';
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'llama3.2';
+import fetch from 'node-fetch';
 
 // POST /api/ai-quiz — generate a 5-question multiple-choice quiz using AI
 export async function POST(request) {
@@ -12,8 +14,9 @@ export async function POST(request) {
     return Response.json({ error: 'subject must be one of: Math, Science, English, History' }, { status: 400 });
   }
 
-  if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'your-openai-api-key-here') {
-    return Response.json({ error: 'OpenAI API key is not configured.' }, { status: 503 });
+
+  if (!OLLAMA_MODEL) {
+    return Response.json({ error: 'Ollama model is not configured.' }, { status: 503 });
   }
 
   const topicClause = topic ? ` specifically about "${topic}"` : '';
@@ -38,29 +41,35 @@ Rules:
 - Questions should be clear, educational, and appropriate for the grade level.`;
 
   try {
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are an expert tutor who creates clear, accurate multiple-choice quizzes for middle and high school students. Always respond with valid JSON only — no markdown code fences, no extra text.',
-        },
-        { role: 'user', content: prompt },
-      ],
-      temperature: 0.7,
-      max_tokens: 1200,
+    // Ollama expects: { model, messages: [{role, content}], stream }
+    const ollamaRes = await fetch(OLLAMA_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: OLLAMA_MODEL,
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an expert tutor who creates clear, accurate multiple-choice quizzes for middle and high school students. Always respond with valid JSON only — no markdown code fences, no extra text.'
+          },
+          { role: 'user', content: prompt }
+        ],
+        stream: false
+      })
     });
-
-    const raw = completion.choices[0].message.content.trim();
-
-    // Strip markdown code fences if the model includes them anyway
+    if (!ollamaRes.ok) {
+      const errText = await ollamaRes.text();
+      throw new Error(`Ollama error: ${ollamaRes.status} ${errText}`);
+    }
+    const ollamaData = await ollamaRes.json();
+    // Ollama returns { message: { content: string } }
+    const raw = ollamaData.message?.content?.trim?.() || '';
+    // Strip markdown code fences if present
     const clean = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
     const parsed = JSON.parse(clean);
-
     if (!Array.isArray(parsed.questions) || parsed.questions.length === 0) {
       throw new Error('Unexpected response format from AI');
     }
-
     return Response.json(parsed);
   } catch (err) {
     console.error('AI quiz generation error:', err);

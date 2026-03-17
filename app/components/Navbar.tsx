@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
   const { student, logout } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -114,7 +117,7 @@ export default function Navbar() {
 
         {/* Auth Button */}
         <div>
-          {student ? (
+          {mounted && student ? (
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <Link
                 href="/dashboard"

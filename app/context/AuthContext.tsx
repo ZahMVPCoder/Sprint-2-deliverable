@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 export interface Student {
   id: string;
@@ -24,15 +24,16 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [student, setStudentState] = useState<Student | null>(() => {
-    if (typeof window === "undefined") return null;
+  const [student, setStudentState] = useState<Student | null>(null);
+
+  useEffect(() => {
     try {
       const stored = localStorage.getItem("brightpath_student");
-      return stored ? JSON.parse(stored) : null;
+      if (stored) setStudentState(JSON.parse(stored));
     } catch {
-      return null;
+      // ignore
     }
-  });
+  }, []);
 
   const setStudent = (s: Student | null) => {
     setStudentState(s);
