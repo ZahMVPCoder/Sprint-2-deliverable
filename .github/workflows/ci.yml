@@ -70,5 +70,5 @@ jobs:
             cd ~/app
             git pull origin main
             # 3. Start/restart containers
-            docker compose down || true
-            docker compose up -d --build
+            docker-compose down || true
+            docker-compose up -d --build
