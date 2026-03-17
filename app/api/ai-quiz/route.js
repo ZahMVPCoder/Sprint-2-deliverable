@@ -2,7 +2,6 @@
 // Use Ollama HTTP API instead of OpenAI
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://host.docker.internal:11434/api/chat';
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'llama3.2';
-import fetch from 'node-fetch';
 
 // POST /api/ai-quiz — generate a 5-question multiple-choice quiz using AI
 export async function POST(request) {
