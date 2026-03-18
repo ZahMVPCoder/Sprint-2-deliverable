@@ -56,6 +56,9 @@ model QuizResult {
   quizId      Int
   score       Int
   completedAt DateTime @default(now())
+  subject     String?  // For AI quizzes
+  total       Int?     // For AI quizzes: total questions
+  correct     Int?     // For AI quizzes: correct answers
   student     Student  @relation(fields: [studentId], references: [id])
   quiz        Quiz     @relation(fields: [quizId], references: [id])
 }
