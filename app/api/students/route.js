@@ -29,5 +29,11 @@ export async function POST(request) {
     select: { id: true, name: true, email: true, gradeLevel: true, createdAt: true },
   });
 
-  return Response.json(student, { status: 201 });
+  // Add lessonsCompleted and averageQuizScore (default 0)
+  const safeStudent = {
+    ...student,
+    lessonsCompleted: 0,
+    averageQuizScore: 0,
+  };
+  return Response.json(safeStudent, { status: 201 });
 }

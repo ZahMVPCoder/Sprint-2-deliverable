@@ -56,6 +56,8 @@ jobs:
           host: ${{ secrets.EC2_HOST }}         # Your EC2 public IP or DNS
           username: ${{ secrets.EC2_USER }}     #untu or ec2-user
           key: ${{ secrets.EC2_KEY }}           # Contents of your .pem private key
+          timeout: 60m
+          command_timeout: 60m
           script: |
             # 1. Install prerequisites
             # 1. Install prerequisites

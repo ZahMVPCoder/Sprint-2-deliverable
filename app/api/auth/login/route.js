@@ -18,6 +18,17 @@ export async function POST(request) {
   }
 
   // Return safe student data — never expose the password hash
-  const { passwordHash: _, ...safeStudent } = student;
+  const { passwordHash: _, ...rest } = student;
+  // Compute lessonsCompleted and averageQuizScore
+  const completions = await prisma.lessonCompletion.count({ where: { studentId: student.id } });
+  const quizResults = await prisma.quizResult.findMany({ where: { studentId: student.id } });
+  const avgScore = quizResults.length
+    ? Math.round(quizResults.reduce((a, b) => a + b.score, 0) / quizResults.length)
+    : 0;
+  const safeStudent = {
+    ...rest,
+    lessonsCompleted: completions,
+    averageQuizScore: avgScore,
+  };
   return Response.json({ student: safeStudent });
 }
