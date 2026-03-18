@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 
 type Subject = "Math" | "Science" | "English" | "History";
@@ -12,6 +13,224 @@ interface Question {
   answer: string;   // "A" | "B" | "C" | "D"
 }
 
+type ResultsSectionProps = {
+  student: any;
+  subject: Subject | null;
+  topic: string;
+  questions: Question[];
+  answers: { selected: string; correct: string }[];
+  score: number;
+  pct: number;
+  scoreColor: string;
+  scoreBg: string;
+  scoreEmoji: string;
+  scoreMsg: string;
+  generate: () => void;
+  reset: () => void;
+};
+
+function ResultsSection({
+  student,
+  subject,
+  topic,
+  questions,
+  answers,
+  score,
+  pct,
+  scoreColor,
+  scoreBg,
+  scoreEmoji,
+  scoreMsg,
+  generate,
+  reset,
+}: ResultsSectionProps) {
+  useEffect(() => {
+    if (!student?.id || !subject || !questions?.length || !answers?.length) return;
+    const payload = {
+      studentId: student.id,
+      type: "quiz",
+      subject,
+      topic: topic || undefined,
+      score,
+      total: questions.length,
+      correct: score,
+      answers,
+      questions,
+    };
+    fetch("/api/progress", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }).catch(() => {});
+  }, [student, subject, topic, questions, answers, score]);
+  return (
+    <div>
+      <div className="card animate-fade-up" style={{ padding: 32, textAlign: "center", marginBottom: 20 }}>
+        <div style={{
+          width: 80, height: 80,
+          borderRadius: "50%",
+          background: scoreBg,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          margin: "0 auto 16px",
+          fontSize: 36,
+        }}>
+          {scoreEmoji}
+        </div>
+        <p style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 42, marginBottom: 4, color: scoreColor }}>
+          {pct}%
+        </p>
+        <p style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 16, marginBottom: 8 }}>
+          {score} out of {questions.length} correct
+        </p>
+        <p style={{ color: "var(--color-text-muted)", fontFamily: "var(--font-body)", fontSize: 14 }}>
+          {scoreMsg}
+        </p>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 24 }}>
+        {questions.map((q, i) => {
+          const a = answers[i];
+          const correct = a?.selected === a?.correct;
+          const correctOption = q.options.find((opt) => opt.startsWith(a?.correct + "."));
+          return (
+            <div key={i} className="card" style={{ padding: 20, borderLeft: `4px solid ${correct ? "#10B981" : "#EF4444"}` }}>
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: correct ? 0 : 8 }}>
+                <p style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "var(--color-text)", flex: 1, lineHeight: 1.5 }}>
+                  {i + 1}. {q.question}
+                </p>
+                <span style={{ fontSize: 16, flexShrink: 0 }}>{correct ? "✅" : "❌"}</span>
+              </div>
+              {!correct && correctOption && (
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#059669" }}>
+                  ✓ Correct: {correctOption.replace(/^[A-D]\.\s*/, "")}
+                </p>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ display: "flex", gap: 12 }}>
+        <button
+          onClick={generate}
+          style={{
+            flex: 1,
+            padding: "14px 24px",
+            borderRadius: 12,
+            fontFamily: "var(--font-display)",
+            fontWeight: 700,
+            fontSize: 15,
+            cursor: "pointer",
+            border: "none",
+            background: "var(--color-primary)",
+            color: "white",
+          }}
+        >
+          Retry Same Topic ↩
+        </button>
+        <button
+          onClick={reset}
+          style={{
+            flex: 1,
+            padding: "14px 24px",
+            borderRadius: 12,
+            fontFamily: "var(--font-display)",
+            fontWeight: 700,
+            fontSize: 15,
+            cursor: "pointer",
+            border: "1.5px solid var(--color-border)",
+            background: "white",
+            color: "var(--color-text)",
+          }}
+        >
+          New Quiz +
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div>
+      <div className="card animate-fade-up" style={{ padding: 32, textAlign: "center", marginBottom: 20 }}>
+        <div style={{
+          width: 80, height: 80,
+          borderRadius: "50%",
+          background: scoreBg,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          margin: "0 auto 16px",
+          fontSize: 36,
+        }}>
+          {scoreEmoji}
+        </div>
+        <p style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 42, marginBottom: 4, color: scoreColor }}>
+          {pct}%
+        </p>
+        <p style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 16, marginBottom: 8 }}>
+          {score} out of {questions.length} correct
+        </p>
+        <p style={{ color: "var(--color-text-muted)", fontFamily: "var(--font-body)", fontSize: 14 }}>
+          {scoreMsg}
+        </p>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 24 }}>
+        {questions.map((q, i) => {
+          const a = answers[i];
+          const correct = a?.selected === a?.correct;
+          const correctOption = q.options.find((opt) => opt.startsWith(a?.correct + "."));
+          return (
+            <div key={i} className="card" style={{ padding: 20, borderLeft: `4px solid ${correct ? "#10B981" : "#EF4444"}` }}>
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: correct ? 0 : 8 }}>
+                <p style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "var(--color-text)", flex: 1, lineHeight: 1.5 }}>
+                  {i + 1}. {q.question}
+                </p>
+                <span style={{ fontSize: 16, flexShrink: 0 }}>{correct ? "✅" : "❌"}</span>
+              </div>
+              {!correct && correctOption && (
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#059669" }}>
+                  ✓ Correct: {correctOption.replace(/^[A-D]\.\s*/, "")}
+                </p>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ display: "flex", gap: 12 }}>
+        <button
+          onClick={generate}
+          style={{
+            flex: 1,
+            padding: "14px 24px",
+            borderRadius: 12,
+            fontFamily: "var(--font-display)",
+            fontWeight: 700,
+            fontSize: 15,
+            cursor: "pointer",
+            border: "none",
+            background: "var(--color-primary)",
+            color: "white",
+          }}
+        >
+          Retry Same Topic ↩
+        </button>
+        <button
+          onClick={reset}
+          style={{
+            flex: 1,
+            padding: "14px 24px",
+            borderRadius: 12,
+            fontFamily: "var(--font-display)",
+            fontWeight: 700,
+            fontSize: 15,
+            cursor: "pointer",
+            border: "1.5px solid var(--color-border)",
+            background: "white",
+            color: "var(--color-text)",
+          }}
+        >
+          New Quiz +
+        </button>
+      </div>
+    </div>
+  );
+}
 const SUBJECT_STYLE: Record<Subject, { bg: string; text: string; border: string; icon: string }> = {
   Math:    { bg: "#DBEAFE", text: "#2563EB", border: "#BFDBFE", icon: "📐" },
   Science: { bg: "#D1FAE5", text: "#059669", border: "#A7F3D0", icon: "🔬" },
@@ -341,93 +560,23 @@ export default function AIQuizPage() {
 
       {/* ── RESULTS ── */}
       {step === "results" && (
-        <div>
-          {/* Score card */}
-          <div className="card animate-fade-up" style={{ padding: 32, textAlign: "center", marginBottom: 20 }}>
-            <div style={{
-              width: 80, height: 80,
-              borderRadius: "50%",
-              background: scoreBg,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              margin: "0 auto 16px",
-              fontSize: 36,
-            }}>
-              {scoreEmoji}
-            </div>
-            <p style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 42, marginBottom: 4, color: scoreColor }}>
-              {pct}%
-            </p>
-            <p style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 16, marginBottom: 8 }}>
-              {score} out of {questions.length} correct
-            </p>
-            <p style={{ color: "var(--color-text-muted)", fontFamily: "var(--font-body)", fontSize: 14 }}>
-              {scoreMsg}
-            </p>
-          </div>
-
-          {/* Answer review */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 24 }}>
-            {questions.map((q, i) => {
-              const a = answers[i];
-              const correct = a?.selected === a?.correct;
-              const correctOption = q.options.find((opt) => opt.startsWith(a?.correct + "."));
-              return (
-                <div key={i} className="card" style={{ padding: 20, borderLeft: `4px solid ${correct ? "#10B981" : "#EF4444"}` }}>
-                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: correct ? 0 : 8 }}>
-                    <p style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "var(--color-text)", flex: 1, lineHeight: 1.5 }}>
-                      {i + 1}. {q.question}
-                    </p>
-                    <span style={{ fontSize: 16, flexShrink: 0 }}>{correct ? "✅" : "❌"}</span>
-                  </div>
-                  {!correct && correctOption && (
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#059669" }}>
-                      ✓ Correct: {correctOption.replace(/^[A-D]\.\s*/, "")}
-                    </p>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Action buttons */}
-          <div style={{ display: "flex", gap: 12 }}>
-            <button
-              onClick={generate}
-              style={{
-                flex: 1,
-                padding: "14px 24px",
-                borderRadius: 12,
-                fontFamily: "var(--font-display)",
-                fontWeight: 700,
-                fontSize: 15,
-                cursor: "pointer",
-                border: "none",
-                background: "var(--color-primary)",
-                color: "white",
-              }}
-            >
-              Retry Same Topic ↩
-            </button>
-            <button
-              onClick={reset}
-              style={{
-                flex: 1,
-                padding: "14px 24px",
-                borderRadius: 12,
-                fontFamily: "var(--font-display)",
-                fontWeight: 700,
-                fontSize: 15,
-                cursor: "pointer",
-                border: "1.5px solid var(--color-border)",
-                background: "white",
-                color: "var(--color-text)",
-              }}
-            >
-              New Quiz +
-            </button>
-          </div>
-        </div>
+        <ResultsSection
+          student={student}
+          subject={subject}
+          topic={topic}
+          questions={questions}
+          answers={answers}
+          score={score}
+          pct={pct}
+          scoreColor={scoreColor}
+          scoreBg={scoreBg}
+          scoreEmoji={scoreEmoji}
+          scoreMsg={scoreMsg}
+          generate={generate}
+          reset={reset}
+        />
       )}
+
 
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
