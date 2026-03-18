@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import type { Student } from "../context/AuthContext";
 
 type Subject = "Math" | "Science" | "English" | "History";
 type Step = "setup" | "loading" | "quiz" | "results";
@@ -14,7 +15,7 @@ interface Question {
 }
 
 type ResultsSectionProps = {
-  student: any;
+  student: Student | null;
   subject: Subject | null;
   topic: string;
   questions: Question[];
