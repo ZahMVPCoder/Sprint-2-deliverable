@@ -4,6 +4,8 @@ FROM node:25-alpine3.22
 WORKDIR /app
 ## Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
+## Copy prisma directory before npm install (so schema.prisma is available)
+COPY prisma ./prisma
 ## Install dependencies defined in package.json
 RUN npm install
 ## Copy all remaining files from the project into the container
